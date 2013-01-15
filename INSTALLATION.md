@@ -59,7 +59,7 @@ Steps
   cd ~/Documents/thesis/webapp/ && bundle install
 ```
 
-11. Install a JavaScript runtime environemnt (NodeJS includes the v8 engine)
+11. Install a JavaScript runtime environment (NodeJS includes the v8 engine)
 ```bash
   sudo apt-get install nodejs
 ```

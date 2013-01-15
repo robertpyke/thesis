@@ -7,6 +7,7 @@ Technologies Used
 - Ruby 1.9.3
 - Rails 3.2.11
 - psql (PostgreSQL) 9.1.7
+- postgis 1.5.3 (1.5.3-2ubuntu1)
 - Git (version control)
 
 Steps

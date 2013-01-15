@@ -48,7 +48,12 @@ Steps
   sudo apt-get install postgresql-9.1-postgis
 ```
 
-9. Install gems
+9. Install the C postgresql adapter header files
+```bash
+  sudo apt-get install libpq-dev
+```
+
+10. Install gems
 ```bash
   cd ~/Documents/thesis/webapp/ && bundle install
 ```

@@ -38,7 +38,17 @@ Steps
   cd ~/Documents && git clone git://github.com/robertpyke/thesis.git
 ```
 
-7. Install gems
+7. Install build-essential packages
+```bash
+  sudo apt-get install build-essential
+```
+
+8. Install postgresql 9.1 and postgis
+```bash
+  sudo apt-get install postgresql-9.1-postgis
+```
+
+9. Install gems
 ```bash
   cd ~/Documents/thesis/webapp/ && bundle install
 ```

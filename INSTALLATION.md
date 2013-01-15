@@ -25,7 +25,7 @@ Steps
 
 4. Install Bundler (gem)
 ```bash
-  gem1.9.3 install bundler
+  sudo gem1.9.3 install bundler
 ```
 
 5. Install Git

@@ -2,8 +2,8 @@ development:
   adapter: postgis
   encoding: unicode
   database: robertpyke_thesis_dev_database
-#  username:
-#  password:
+  username: robert_thesis_pg_user
+  password: login_password
   pool: 5
   host: localhost
   port: 5432
@@ -12,8 +12,8 @@ test:
   adapter: postgis
   encoding: unicode
   database: robertpyke_thesis_test_database
-#  username:
-#  password:
+  username: robert_thesis_pg_user
+  password: login_password
   pool: 5
   host: localhost
   port: 5432
@@ -22,8 +22,8 @@ production:
   adapter: postgis
   encoding: unicode
   database: robertpyke_thesis_prod_database
-#  username:
-#  password:
+  username: robert_thesis_pg_user
+  password: login_password
   pool: 5
   host: localhost
   port: 5432

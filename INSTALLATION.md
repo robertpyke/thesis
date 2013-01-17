@@ -11,7 +11,7 @@ Technologies Used
 - postgis 1.5.3 (1.5.3-2ubuntu1)
 - Git (version control)
 
-Steps
+Installation Steps
 ------
 
 1. Install Ubuntu 12.10
@@ -35,7 +35,7 @@ Steps
   sudo apt-get install git-core
 ```
 
-6. Git Clone the Repository
+6. Git Clone the Repository (read only git repo URL provided)
 ```bash
   cd ~/Documents && git clone git://github.com/robertpyke/thesis.git
 ```
@@ -65,14 +65,21 @@ Steps
   sudo apt-get install nodejs
 ```
 
-12. Add a role to postgresql for this app. Note, you should change the password.
+12. Add a role to postgresql for this app. You should change the password from _login_password_. 
+    Note that the created user is a **SUPERUSER**.
+    **SUPERUSER** privileges are required to execute the postgis c functions.
 ```bash
   sudo -u postgres psql
-    >  create role robert_thesis_pg_user with createdb login password 'login_password';
+    >  create role robert_thesis_pg_user SUPERUSER login password 'login_password';
     >  \q
 ```
 
 13. Update the password in the database config file accordingly.
 ```bash
    xdg-open ~/Documents/thesis/webapp/config/database.yml
+```
+
+14. Create and setup (migrate) the databases
+```bash
+  cd ~/Documents/thesis/webapp && rake db:create:all && rake db:migrate
 ```

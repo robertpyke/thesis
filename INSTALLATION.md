@@ -65,10 +65,12 @@ Installation Steps
   sudo apt-get install nodejs
 ```
 
-12. Add a role to postgresql for this app. Note, you should change the password from _login_password_.
+12. Add a role to postgresql for this app. You should change the password from _login_password_. 
+    Note that the created user is a **SUPERUSER**.
+    **SUPERUSER** privileges are required to execute the postgis c functions.
 ```bash
   sudo -u postgres psql
-    >  create role robert_thesis_pg_user with createdb login password 'login_password';
+    >  create role robert_thesis_pg_user SUPERUSER login password 'login_password';
     >  \q
 ```
 

@@ -4,6 +4,7 @@ Installation Guide
 Technologies Used
 -------------------
 
+- Ubuntu 12.10
 - Ruby 1.9.3
 - Rails 3.2.11
 - psql (PostgreSQL) 9.1.7

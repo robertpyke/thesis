@@ -64,3 +64,15 @@ Steps
 ```bash
   sudo apt-get install nodejs
 ```
+
+12. Add a role to postgresql for this app. Note, you should change the password.
+```bash
+  sudo -u postgres psql
+    >  create role robert_thesis_pg_user with createdb login password 'login_password';
+    >  \q
+```
+
+13. Update the password in the database config file accordingly.
+```bash
+   xdg-open ~/Documents/thesis/webapp/config/database.yml
+```

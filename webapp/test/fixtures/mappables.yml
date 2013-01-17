@@ -1,9 +1,11 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
 
-one:
-  geometry: 
-  description: MyText
+<% factory = ::RGeo::Cartesian.preferred_factory() %>
 
-two:
-  geometry: 
-  description: MyText
+sydney:
+  geometry: <%= factory.point(-33.8683, 151.2086) %>
+  description: Capital of NSW
+
+brisbane:
+  geometry: <%= factory.point(-27.4667, 153.0333) %>
+  description: Capital of QLD

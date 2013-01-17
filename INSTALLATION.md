@@ -76,3 +76,8 @@ Steps
 ```bash
    xdg-open ~/Documents/thesis/webapp/config/database.yml
 ```
+
+14. Create and setup (migrate) the databases
+```bash
+  cd ~/Documents/thesis/webapp && rake db:create:all && rake db:migrate
+```

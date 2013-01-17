@@ -11,7 +11,7 @@ Technologies Used
 - postgis 1.5.3 (1.5.3-2ubuntu1)
 - Git (version control)
 
-Steps
+Installation Steps
 ------
 
 1. Install Ubuntu 12.10

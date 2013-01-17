@@ -1,29 +1,21 @@
-development:
+defaults: &defaults
   adapter: postgis
   encoding: unicode
-  database: robertpyke_thesis_dev_database
   username: robert_thesis_pg_user
   password: login_password
   pool: 5
   host: localhost
   port: 5432
+  script_dir: /usr/share/postgresql/9.1/contrib/postgis-1.5/
+
+development:
+  <<: *defaults
+  database: robertpyke_thesis_dev_database
 
 test:
-  adapter: postgis
-  encoding: unicode
+  <<: *defaults
   database: robertpyke_thesis_test_database
-  username: robert_thesis_pg_user
-  password: login_password
-  pool: 5
-  host: localhost
-  port: 5432
 
 production:
-  adapter: postgis
-  encoding: unicode
+  <<: *defaults
   database: robertpyke_thesis_prod_database
-  username: robert_thesis_pg_user
-  password: login_password
-  pool: 5
-  host: localhost
-  port: 5432

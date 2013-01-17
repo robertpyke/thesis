@@ -41,3 +41,6 @@ gem 'activerecord-postgis-adapter'
 
 # Gems used for handling lower level SQL queries
 gem 'squeel'
+
+# Gems used for authentication
+gem 'devise'

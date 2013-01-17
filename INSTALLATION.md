@@ -35,7 +35,7 @@ Installation Steps
   sudo apt-get install git-core
 ```
 
-6. Git Clone the Repository
+6. Git Clone the Repository (read only git repo URL provided)
 ```bash
   cd ~/Documents && git clone git://github.com/robertpyke/thesis.git
 ```

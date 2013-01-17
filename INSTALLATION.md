@@ -65,7 +65,7 @@ Steps
   sudo apt-get install nodejs
 ```
 
-12. Add a role to postgresql for this app. Note, you should change the password.
+12. Add a role to postgresql for this app. Note, you should change the password from _login_password_.
 ```bash
   sudo -u postgres psql
     >  create role robert_thesis_pg_user with createdb login password 'login_password';

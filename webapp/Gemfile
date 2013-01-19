@@ -47,3 +47,6 @@ gem 'devise'
 
 # Gems providing additional generators
 gem 'nested_scaffold'
+
+# Gems for attaching files to models
+gem "paperclip", "~> 3.0"

@@ -1,4 +1,8 @@
 Webapp::Application.routes.draw do
+  resources :maps do
+    resources :layers
+  end
+
   resources :maps
 
   devise_for :users

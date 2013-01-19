@@ -11,7 +11,16 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130119042654) do
+ActiveRecord::Schema.define(:version => 20130119070102) do
+
+  create_table "layers", :force => true do |t|
+    t.integer  "map_id"
+    t.string   "name"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  add_index "layers", ["map_id"], :name => "index_layers_on_map_id"
 
   create_table "mappables", :force => true do |t|
     t.text     "description"

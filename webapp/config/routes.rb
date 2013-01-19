@@ -1,4 +1,6 @@
 Webapp::Application.routes.draw do
+  resources :maps
+
   devise_for :users
 
   # The priority is based upon order of creation:

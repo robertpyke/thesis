@@ -44,3 +44,6 @@ gem 'squeel'
 
 # Gems used for authentication
 gem 'devise'
+
+# Gems providing additional generators
+gem 'nested_scaffold'

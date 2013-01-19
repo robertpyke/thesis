@@ -5,7 +5,7 @@
 # You can add this hook by running the following from the root of this repo:
 #
 #   ln -s ../../hooks/pre-commit .git/hooks/pre-commit
-#
+
 # If you want to allow tests to fail, set this variable to true by running:
 #
 #     git config hooks.allowteststofail true

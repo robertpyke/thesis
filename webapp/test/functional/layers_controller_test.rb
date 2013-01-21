@@ -1,11 +1,18 @@
 require 'test_helper'
 
 class LayersControllerTest < ActionController::TestCase
+
+  def get_csv_file
+    fixture_file_upload "sample_layer_data.csv", "text/csv"
+  end
+
   setup do
     @user = users(:robert)
     @user_two = users(:john)
     @map = maps(:one)
+
     @layer = layers(:one)
+    @layer.data_file = get_csv_file
   end
 
   test "should get index" do
@@ -38,7 +45,7 @@ class LayersControllerTest < ActionController::TestCase
     sign_in @map.user
 
     assert_difference('Layer.count') do
-      post :create, map_id: @map, layer: { name: "new_name" }
+      post :create, map_id: @map, layer: { name: "new_name", data_file: get_csv_file }
     end
 
     assert_redirected_to map_layer_path(@map, assigns(:layer))
@@ -49,7 +56,7 @@ class LayersControllerTest < ActionController::TestCase
     assert_not_equal @map.user, @user_two
 
     assert_no_difference('Layer.count') do
-      post :create, map_id: @map, layer: { name: "new_name" }
+      post :create, map_id: @map, layer: { name: "new_name", data_file: get_csv_file }
     end
 
     assert_redirected_to new_user_session_path
@@ -57,7 +64,7 @@ class LayersControllerTest < ActionController::TestCase
 
   test "should not create layer as not logged in" do
     assert_no_difference('Layer.count') do
-      post :create, map_id: @map, layer: { name: "new_name" }
+      post :create, map_id: @map, layer: { name: "new_name", data_file: get_csv_file }
     end
 
     assert_redirected_to new_user_session_path
@@ -91,7 +98,7 @@ class LayersControllerTest < ActionController::TestCase
   test "should update layer as logged in as map owner" do
     sign_in @map.user
 
-    put :update, map_id: @map, id: @layer.to_param, layer: { name: "new_name" }
+    put :update, map_id: @map, id: @layer.to_param, layer: { name: "new_name", data_file: get_csv_file }
     assert_redirected_to map_layer_path(@map, assigns(:layer))
   end
 
@@ -99,12 +106,12 @@ class LayersControllerTest < ActionController::TestCase
     sign_in @user_two
     assert_not_equal @map.user, @user_two
 
-    put :update, map_id: @map, id: @layer.to_param, layer: { name: "new_name" }
+    put :update, map_id: @map, id: @layer.to_param, layer: { name: "new_name", data_file: get_csv_file }
     assert_redirected_to new_user_session_path
   end
 
   test "should not update layer as not logged in" do
-    put :update, map_id: @map, id: @layer.to_param, layer: { name: "new_name" }
+    put :update, map_id: @map, id: @layer.to_param, layer: { name: "new_name", data_file: get_csv_file }
     assert_redirected_to new_user_session_path
   end
 

@@ -3,9 +3,7 @@
 <% factory = ::RGeo::Cartesian.preferred_factory() %>
 
 sydney:
-  geometry: <%= factory.point(-33.8683, 151.2086) %>
-  description: Capital of NSW
+  geometry: <%= factory.point(151.2086, -33.8683) %>
 
 brisbane:
-  geometry: <%= factory.point(-27.4667, 153.0333) %>
-  description: Capital of QLD
+  geometry: <%= factory.point(153.0333, -27.4667) %>

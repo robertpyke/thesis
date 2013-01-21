@@ -11,22 +11,35 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130119070102) do
+ActiveRecord::Schema.define(:version => 20130121113951) do
+
+  create_table "descriptors", :force => true do |t|
+    t.string   "label"
+    t.text     "value"
+    t.integer  "mappable_id"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
 
   create_table "layers", :force => true do |t|
     t.integer  "map_id"
     t.string   "name"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",             :null => false
+    t.datetime "updated_at",             :null => false
+    t.string   "data_file_file_name"
+    t.string   "data_file_content_type"
+    t.integer  "data_file_file_size"
+    t.datetime "data_file_updated_at"
+    t.string   "data_file_fingerprint"
   end
 
   add_index "layers", ["map_id"], :name => "index_layers_on_map_id"
 
   create_table "mappables", :force => true do |t|
-    t.text     "description"
-    t.datetime "created_at",                                            :null => false
-    t.datetime "updated_at",                                            :null => false
-    t.spatial  "geometry",    :limit => {:srid=>-1, :type=>"geometry"}
+    t.datetime "created_at",                                           :null => false
+    t.datetime "updated_at",                                           :null => false
+    t.spatial  "geometry",   :limit => {:srid=>-1, :type=>"geometry"}
+    t.integer  "layer_id"
   end
 
   create_table "maps", :force => true do |t|

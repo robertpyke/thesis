@@ -1,4 +1,4 @@
-<%= form_for([@layer.map, @layer]) do |f| %>
+<%= form_for([@layer.map, @layer], :html => { :multipart => true }) do |f| %>
   <% if @layer.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@layer.errors.count, "error") %> prohibited this layer from being saved:</h2>
@@ -15,7 +15,15 @@
     <%= f.label :name %><br />
     <%= f.text_field :name %>
   </div>
+
+  <div class="field">
+    <%= f.label :data_file %><br />
+    <%= f.file_field :data_file %>
+  </div>
+
   <div class="actions">
     <%= f.submit %>
   </div>
+
+
 <% end %>

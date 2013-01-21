@@ -5,6 +5,10 @@
   <%= @layer.name %>
 </p>
 
+<p>
+  <b>Data File:</b>
+  <%= link_to "Download data file", @layer.data_file.url %>
+</p>
 
 <%= link_to 'Edit', edit_map_layer_path(@layer.map, @layer) %> |
 <%= link_to 'Back', map_layers_path(@layer.map) %>

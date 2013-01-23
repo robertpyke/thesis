@@ -1,5 +1,3 @@
-<p id="notice"><%= notice %></p>
-
 <p>
   <b>Name:</b>
   <%= @map.name %>
@@ -10,6 +8,7 @@
   <%= @map.description %>
 </p>
 
+<%= tag('div', { class: 'map', id: 'map', data: { id: @map.id, url: map_url(@map) } }) %></div>
 
 <%= link_to 'Edit', edit_map_path(@map) %> |
 <%= link_to 'Back', maps_path %>

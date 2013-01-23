@@ -37,6 +37,8 @@ gem 'jquery-rails'
 gem 'debugger'
 
 # Gems used for handling postgis support
+gem 'rgeo'
+gem 'rgeo-geojson'
 gem 'activerecord-postgis-adapter'
 
 # Gems used for handling lower level SQL queries

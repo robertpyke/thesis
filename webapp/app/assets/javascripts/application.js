@@ -12,4 +12,8 @@
 //
 //= require jquery
 //= require jquery_ujs
+//
+// Require OpenLayers from our vendor assets
+//= require OpenLayers
+//
 //= require_tree .

@@ -34,7 +34,14 @@ class LayersController < ApplicationController
 
     respond_to do |format|
       format.html # show.html.erb
-      format.json { render :json => @layer }
+      format.text { render :text => @layer.get_wkt }
+      format.json {
+        if params[:as_geo_json]
+          render :text => @layer.get_geo_json
+        else
+          render :json => @layer
+        end
+      }
     end
   end
 

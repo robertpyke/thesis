@@ -111,4 +111,23 @@ class Layer < ActiveRecord::Base
 
     true
   end
+
+  def get_geo_json
+    geoms = []
+    mappables.each do |mappable|
+      geoms << mappable.geometry
+    end
+    feature_collection = get_rgeo_cartesian_factory.collection(geoms)
+    ::RGeo::GeoJSON.encode(feature_collection)
+  end
+
+  def get_wkt
+    geoms = []
+    mappables.each do |mappable|
+      geoms << mappable.geometry
+    end
+    feature_collection = get_rgeo_cartesian_factory.collection(geoms)
+    feature_collection.as_text
+  end
+
 end

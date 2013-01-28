@@ -36,11 +36,13 @@ ActiveRecord::Schema.define(:version => 20130121113951) do
   add_index "layers", ["map_id"], :name => "index_layers_on_map_id"
 
   create_table "mappables", :force => true do |t|
-    t.datetime "created_at",                                           :null => false
-    t.datetime "updated_at",                                           :null => false
-    t.spatial  "geometry",   :limit => {:srid=>-1, :type=>"geometry"}
+    t.datetime "created_at",                                             :null => false
+    t.datetime "updated_at",                                             :null => false
+    t.spatial  "geometry",   :limit => {:srid=>4326, :type=>"geometry"}
     t.integer  "layer_id"
   end
+
+  add_index "mappables", ["geometry"], :name => "index_mappables_on_geometry", :spatial => true
 
   create_table "maps", :force => true do |t|
     t.integer  "user_id"

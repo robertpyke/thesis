@@ -1,9 +1,10 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
 
-<% factory = ::RGeo::Cartesian.preferred_factory() %>
+# Use EWKT to setup points. It is necessary to specify the SRID for these points
+# due to a geometry column srid assertion
 
 sydney:
-  geometry: <%= factory.point(151.2086, -33.8683) %>
+  geometry: SRID=4326;POINT(151.2086 -33.8683)
 
 brisbane:
-  geometry: <%= factory.point(153.0333, -27.4667) %>
+  geometry: SRID=4326;POINT(153.0333 -27.4667)

@@ -58,7 +58,7 @@ Webapp::Application.routes.draw do
   # just remember to delete public/index.html.
   # root :to => 'welcome#index'
 
-  root :to => 'welcome#index'
+  root :to => 'maps#index'
 
   # See how all your routes lay out with "rake routes"
 

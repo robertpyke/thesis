@@ -31,11 +31,6 @@ class LayerDataFileValidator < ActiveModel::Validator
 end
 
 class Layer < ActiveRecord::Base
-
-  def get_rgeo_cartesian_factory
-    ::RGeo::Cartesian.preferred_factory()
-  end
-
   belongs_to :map
   has_many :mappables, dependent: :destroy
 
@@ -100,7 +95,7 @@ class Layer < ActiveRecord::Base
         end
       end
 
-      geometry_point = get_rgeo_cartesian_factory.point(lat, lng)
+      geometry_point = Mappable.rgeo_factory_for_column(:geometry).point(lng, lat)
 
       mappable = mappables.build
       mappable.geometry = geometry_point
@@ -112,21 +107,37 @@ class Layer < ActiveRecord::Base
     true
   end
 
-  def get_geo_json
+  def get_geo_json(options={})
     geoms = []
-    mappables.each do |mappable|
-      geoms << mappable.geometry
+    if options[:bbox]
+      bbox_mappables = mappables.in_rect(options[:bbox].split(','))
+      bbox_mappables.each do |mappable|
+        geoms << mappable.geometry
+      end
+    else
+      mappables.each do |mappable|
+        geoms << mappable.geometry
+      end
     end
-    feature_collection = get_rgeo_cartesian_factory.collection(geoms)
-    ::RGeo::GeoJSON.encode(feature_collection)
+
+    feature_collection = Mappable.rgeo_factory_for_column(:geometry).collection(geoms)
+    RGeo::GeoJSON.encode(feature_collection)
   end
 
-  def get_wkt
+  def get_wkt(options={})
     geoms = []
-    mappables.each do |mappable|
-      geoms << mappable.geometry
+    if options[:bbox]
+      bbox_mappables = mappables.in_rect(options[:bbox].split(','))
+      bbox_mappables.each do |mappable|
+        geoms << mappable.geometry
+      end
+    else
+      mappables.each do |mappable|
+        geoms << mappable.geometry
+      end
     end
-    feature_collection = get_rgeo_cartesian_factory.collection(geoms)
+
+    feature_collection = Mappable.rgeo_factory_for_column(:geometry).collection(geoms)
     feature_collection.as_text
   end
 

@@ -1,4 +1,4 @@
-<h1>Listing layers</h1>
+<h1>Listing layers for <%= @map.name %></h1>
 
 <table>
   <tr>
@@ -20,4 +20,5 @@
 
 <br />
 
-<%= link_to 'New Layer', new_map_layer_path(params[:map_id]) %>
+<%= link_to 'New Layer', new_map_layer_path(@map) %> |
+<%= link_to 'Back', map_path(@map) %>

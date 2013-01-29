@@ -9,21 +9,13 @@ class LayerDataFileValidator < ActiveModel::Validator
       header_row = csv_rows[0]
       content_rows = csv_rows[1..-1]
 
-      lat_pos = nil
-      lng_pos = nil
+      geometry_index_to_type = Layer.get_geometry_index_to_type_hash(header_row)
+      geometry_types = geometry_index_to_type.values.uniq
 
-      header_row.each_with_index do |el, i|
-        case el.chomp.downcase
-        when 'lat', 'latitude'
-          lat_pos = i
-        when 'lng', 'longitude'
-          lng_pos = i
-        # else the column is a descriptor
-        end
-      end
-
-      if lat_pos.nil? or lng_pos.nil?
-        layer.errors[:data_file] << "This data file doesn't contain " +
+      if geometry_types.include?(:latitude) and geometry_types.include?(:longitude)
+        # all good
+      else
+        layer.errors[:data_file] << "doesn't contain " +
           "latitude and longitude columns"
       end
     end

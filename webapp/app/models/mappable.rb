@@ -34,7 +34,7 @@ class Mappable < ActiveRecord::Base
     lat_lng_range_avg = (lat_range + lng_range) / 2
     lat_lng_range_avg = lat_lng_range_avg.abs
 
-    grid_size = 8
+    grid_size = nil
 
     griddiness = 1
     if lat_lng_range_avg > (griddiness*200)

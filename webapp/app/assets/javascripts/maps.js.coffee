@@ -4,12 +4,29 @@
 
 map = null
 
+# Lat/Lng
+geographic = new OpenLayers.Projection("EPSG:4326");
+
+# Spherical Meters
+mercator = new OpenLayers.Projection("EPSG:900913");
+
+
+world_bounds = new OpenLayers.Bounds();
+world_bounds.extend(new OpenLayers.LonLat(-180,90));
+world_bounds.extend(new OpenLayers.LonLat(180,-90));
+# world_bounds = world_bounds.transform(geographic, mercator);
+
+zoom_bounds = world_bounds;
+
 setup_map = () ->
   # Clear away the old map
   if map
     map.destroy()
 
-  map = new OpenLayers.Map 'map'
+  map = new OpenLayers.Map('map', {
+    maxExtent: world_bounds
+  })
+
   layerSwitcher = new OpenLayers.Control.LayerSwitcher();
   map.addControl(layerSwitcher)
 

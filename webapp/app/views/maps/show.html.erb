@@ -9,8 +9,8 @@
 </p>
 
 <div id="map_options">
-  <label>BBox<input type="checkbox" id="bbox" name="bbox" value="bbox"></label>
-  <label>Cluster<input type="checkbox" id="cluster" name="cluster" value="cluster"></label>
+  <label>BBox<input type="checkbox" id="bbox" name="bbox" value="bbox" checked="checked"></label>
+  <label>Cluster<input type="checkbox" id="cluster" name="cluster" value="cluster" checked="checked"></label>
 </div>
 
 <%= tag('div', { class: 'map', id: 'map', data: { id: @map.id, url: map_url(@map) } }) %></div>

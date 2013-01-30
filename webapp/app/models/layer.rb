@@ -24,6 +24,10 @@ class LayerDataFileValidator < ActiveModel::Validator
 end
 
 class Layer < ActiveRecord::Base
+
+  # The maximum number of features to return from a query
+  FEATURES_QUERY_LIMIT = 1000
+
   belongs_to :map
   has_many :mappables, dependent: :destroy
 
@@ -47,6 +51,7 @@ class Layer < ActiveRecord::Base
   #
   # Returns a hash of index to geometry type.
   # Geometry types include:
+  #
   # * +:latitude+
   # * +:longitude+
 
@@ -127,42 +132,53 @@ class Layer < ActiveRecord::Base
     true
   end
 
-  # Returns the layer's +mappables+ as a GeometryCollection
-  # in *GeoJSON* (+String+)
+  # Returns a feature collection of this layer's mappables.
+  # Uses +options+ to build the feature collection.
+  # +options+ include:
+  #
+  # [+:bbox+] a String representing a bbox "#{w}, #{s}, #{e}, #{n}"
+  # [+:cluster+] +!nil+ if you want the features to be clustered
+  # [+:grid_size+] a Float representing the size of the clusters (lat/lng degrees decimal)
+  #
+  # Feature collection size limited by +FEATURES_QUERY_LIMIT+
+  # regardless of options
 
-  def get_geo_json(options={})
+  def get_feature_collection(options)
     geoms = []
+    mappable_relation = nil
     if options[:bbox]
-      bbox_mappables = mappables.in_rect(options[:bbox].split(','))
-      bbox_mappables.each do |mappable|
-        geoms << mappable.geometry
+      mappable_relation = mappables.in_rect(options[:bbox].split(','))
+    else
+      mappable_relation = mappables
+    end
+
+    if options[:cluster]
+      cluster_result = nil
+      cluster_result = mappable_relation.cluster(options)
+      cluster_result.limit(FEATURES_QUERY_LIMIT).each do |cluster|
+        geoms << Mappable.rgeo_factory_for_column(:geometry).parse_wkt(cluster.cluster_centroid)
       end
     else
-      mappables.each do |mappable|
+      mappable_relation.limit(FEATURES_QUERY_LIMIT).each do |mappable|
         geoms << mappable.geometry
       end
     end
 
     feature_collection = Mappable.rgeo_factory_for_column(:geometry).collection(geoms)
+  end
+
+  # Returns the layer's +mappables+ as a GeometryCollection
+  # in *GeoJSON* (+String+)
+
+  def get_geo_json(options={})
+    feature_collection = get_feature_collection(options)
     RGeo::GeoJSON.encode(feature_collection)
   end
 
   # Returns the layer's +mappables+ as a GeometryCollection in *WKT* (+String+)
 
   def get_wkt(options={})
-    geoms = []
-    if options[:bbox]
-      bbox_mappables = mappables.in_rect(options[:bbox].split(','))
-      bbox_mappables.each do |mappable|
-        geoms << mappable.geometry
-      end
-    else
-      mappables.each do |mappable|
-        geoms << mappable.geometry
-      end
-    end
-
-    feature_collection = Mappable.rgeo_factory_for_column(:geometry).collection(geoms)
+    feature_collection = get_feature_collection(options)
     feature_collection.as_text
   end
 

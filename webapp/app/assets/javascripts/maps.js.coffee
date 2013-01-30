@@ -39,13 +39,17 @@ setup_map = () ->
       else
         strategies = [new OpenLayers.Strategy.Fixed()]
 
+      http_params = {}
+      # Cluster if the cluster checkbox is checked
+      if $("#cluster:checked").length > 0
+        http_params["cluster"] = true
+
       wkt_layer = new OpenLayers.Layer.Vector(layer_name, {
           strategies: strategies
           protocol: new OpenLayers.Protocol.HTTP({
               url: wkt_layer_url
               format: new OpenLayers.Format.WKT()
-              params: {
-              }
+              params: http_params
           })
       })
 

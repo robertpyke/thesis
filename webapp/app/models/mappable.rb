@@ -2,10 +2,10 @@ class Mappable < ActiveRecord::Base
 
   # The smallest grid size for which clustering is enabled.
   # Below this value, grid size is set to nil (no clustering).
-  MIN_GRID_SIZE_BEFORE_NO_CLUSTERING = 0.001
+  MIN_GRID_SIZE_BEFORE_NO_CLUSTERING = 0.01
 
   # The grid size is the span of window divided by GRID_SIZE_WINDOW_FRACTION
-  GRID_SIZE_WINDOW_FRACTION = 50.0
+  GRID_SIZE_WINDOW_FRACTION = 40
 
   attr_accessible :geometry
 
@@ -44,7 +44,7 @@ class Mappable < ActiveRecord::Base
     lat_lng_range_avg = (lat_range + lng_range) / 2
     lat_lng_range_avg = lat_lng_range_avg.abs
 
-    grid_size = ( lat_lng_range_avg / GRID_SIZE_WINDOW_FRACTION ).round(3)
+    grid_size = ( lat_lng_range_avg / GRID_SIZE_WINDOW_FRACTION.to_f ).round(3)
     grid_size = nil if grid_size < MIN_GRID_SIZE_BEFORE_NO_CLUSTERING
 
     grid_size

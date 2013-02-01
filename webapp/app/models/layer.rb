@@ -132,19 +132,29 @@ class Layer < ActiveRecord::Base
     true
   end
 
-  # Returns a feature collection of this layer's mappables.
-  # Uses +options+ to build the feature collection.
+  # Returns an array of GeoJSON::Feature for this layer.
+  # Uses +options+ to define how to build a custom array of features.
   # +options+ include:
   #
   # [+:bbox+] a String representing a bbox "#{w}, #{s}, #{e}, #{n}"
   # [+:cluster+] +!nil+ if you want the features to be clustered
   # [+:grid_size+] a Float representing the size of the clusters (lat/lng degrees decimal)
   #
-  # Feature collection size limited by +FEATURES_QUERY_LIMIT+
+  # The size of the array returned is limited by +FEATURES_QUERY_LIMIT+
   # regardless of options
+  #
+  # Note: The GeoJSON::Feature object type is used as a convenience wrapper to
+  # allow the geometry to be provided with additional information (properties and feature_id).
+  # The underlying geometry can be attained via the GeoJSON::Feature instance
+  # function geometry().
+  #
+  # *Important*: The GeoJSON::Feature is a wrapper. It isn't the same as RGeo::Feature::Geometry.
+  # You should _peel back_ the wrapper if you intend to use the feature for anything
+  # other than GeoJSON encoding. You can _peel back_ the wrapper via the GeoJSON::Feature
+  # instance function +geometry()+.
 
-  def get_feature_collection(options)
-    geoms = []
+  def get_features(options)
+    features = []
     mappable_relation = nil
     if options[:bbox]
       mappable_relation = mappables.in_rect(options[:bbox].split(','))
@@ -156,29 +166,37 @@ class Layer < ActiveRecord::Base
       cluster_result = nil
       cluster_result = mappable_relation.cluster(options)
       cluster_result.limit(FEATURES_QUERY_LIMIT).each do |cluster|
-        geoms << Mappable.rgeo_factory_for_column(:geometry).parse_wkt(cluster.cluster_centroid)
+        geom_feature = Mappable.rgeo_factory_for_column(:geometry).parse_wkt(cluster.cluster_centroid)
+        feature = RGeo::GeoJSON::Feature.new(geom_feature, nil, { cluster_size: cluster.cluster_geometry_count.to_i })
+
+        features << feature
       end
     else
       mappable_relation.limit(FEATURES_QUERY_LIMIT).each do |mappable|
-        geoms << mappable.geometry
+        geom_feature = mappable.geometry
+        feature = RGeo::GeoJSON::Feature.new(geom_feature, mappable.id, { cluster_size: 1 })
+        features << feature
       end
     end
 
-    feature_collection = Mappable.rgeo_factory_for_column(:geometry).collection(geoms)
+    features
   end
 
   # Returns the layer's +mappables+ as a GeometryCollection
   # in *GeoJSON* (+String+)
 
   def get_geo_json(options={})
-    feature_collection = get_feature_collection(options)
+    features = get_features(options)
+    feature_collection = RGeo::GeoJSON::FeatureCollection.new(features)
     RGeo::GeoJSON.encode(feature_collection)
   end
 
   # Returns the layer's +mappables+ as a GeometryCollection in *WKT* (+String+)
 
   def get_wkt(options={})
-    feature_collection = get_feature_collection(options)
+    features = get_features(options)
+    geoms = features.map { |feature| feature.geometry() }
+    feature_collection = Mappable.rgeo_factory_for_column(:geometry).collection(geoms)
     feature_collection.as_text
   end
 

@@ -74,9 +74,11 @@ class Mappable < ActiveRecord::Base
   #
   # +options+ include:
   #
-  # [+:grid_size+] a Float representing the size of the clusters (lat/lng degrees decimal)
-  # [+:bbox+] a String representing a bbox "#{w}, #{s}, #{e}, #{n}". Will be used
-  # to calculate a +grid_size+ if no +grid_size+ option is provided.
+  # [+:grid_size+] a Float representing the size of the
+  #                clusters (lat/lng degrees decimal)
+  # [+:bbox+]      a String representing a bbox "#{w}, #{s}, #{e}, #{n}".
+  #                Will be used to calculate a +grid_size+ if no +grid_size+
+  #                option is provided.
   #
   # If grid_size is determined to be nil, clusters will simply be the result of a group by geometry.
   # i.e. Clusters of exact geometries (e.g. the same point)
@@ -89,13 +91,13 @@ class Mappable < ActiveRecord::Base
   #
   # The following is an example of the SQL that this will produce:
   #
-  # select
-  #   count(geometry) as cluster_geometry_count,
-  #   ST_AsText(ST_Centroid(ST_Collect( geometry ))) AS cluster_centroid
-  # from "mappables"
-  # group by
-  #   ST_SnapToGrid(geometry, :grid_size)
-  # ;
+  #   select
+  #     count(geometry) as cluster_geometry_count,
+  #     ST_AsText(ST_Centroid(ST_Collect( geometry ))) AS cluster_centroid
+  #   from "mappables"
+  #   group by
+  #     ST_SnapToGrid(geometry, :grid_size)
+  #   ;
 
   def self.cluster options
     grid_size = options[:grid_size]

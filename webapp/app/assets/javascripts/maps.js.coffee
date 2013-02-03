@@ -5,10 +5,10 @@
 map = null
 
 # Lat/Lng
-geographic = new OpenLayers.Projection("EPSG:4326");
+geographic = new OpenLayers.Projection("EPSG:4326")
 
 # Spherical Meters
-mercator = new OpenLayers.Projection("EPSG:900913");
+mercator = new OpenLayers.Projection("EPSG:900913")
 
 
 # The bounds of the world.
@@ -31,7 +31,7 @@ setup_map = () ->
     maxResolution: 156543.0339
   })
 
-  layerSwitcher = new OpenLayers.Control.LayerSwitcher();
+  layerSwitcher = new OpenLayers.Control.LayerSwitcher()
   map.addControl(layerSwitcher)
 
   osm_layer = new OpenLayers.Layer.OSM()

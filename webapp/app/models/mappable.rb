@@ -1,4 +1,12 @@
 class Mappable < ActiveRecord::Base
+
+  # The smallest grid size for which clustering is enabled.
+  # Below this value, grid size is set to nil (no clustering).
+  MIN_GRID_SIZE_BEFORE_NO_CLUSTERING = 0.01
+
+  # The grid size is the span of window divided by GRID_SIZE_WINDOW_FRACTION
+  GRID_SIZE_WINDOW_FRACTION = 40
+
   attr_accessible :geometry
 
   self.rgeo_factory_generator = RGeo::Geos.factory_generator
@@ -22,6 +30,8 @@ class Mappable < ActiveRecord::Base
   # Given a bbox, determine the appropriate grid size
   # for clustering.
   # If bbox is nil, returns a grid_size of nil.
+  #
+  # [+:bbox+]      a String representing a bbox "#{w}, #{s}, #{e}, #{n}".
 
   def self.get_cluster_grid_size(bbox=nil)
     return nil if bbox.nil?
@@ -34,39 +44,10 @@ class Mappable < ActiveRecord::Base
     lat_lng_range_avg = (lat_range + lng_range) / 2
     lat_lng_range_avg = lat_lng_range_avg.abs
 
-    grid_size = nil
-
-    griddiness = 1
-    if lat_lng_range_avg > (griddiness*200)
-      grid_size = 8
-    elsif lat_lng_range_avg > (griddiness*100)
-      grid_size = 4
-    elsif lat_lng_range_avg > (griddiness*50)
-      grid_size = 2
-    elsif lat_lng_range_avg > (griddiness*25)
-      grid_size = 1
-    elsif lat_lng_range_avg > (griddiness*12)
-      grid_size = 0.5
-    elsif lat_lng_range_avg > (griddiness*5)
-      grid_size = 0.25
-    elsif lat_lng_range_avg > (griddiness*2)
-      grid_size = 0.125
-    elsif lat_lng_range_avg > (griddiness*1)
-      grid_size = 0.0625
-=begin
-    elsif lat_lng_range_avg > (griddiness*0.5)
-      grid_size = nil
-    elsif lat_lng_range_avg > (griddiness*0.25)
-      grid_size = nil
-    elsif lat_lng_range_avg > (griddiness*0.125)
-      grid_size = nil
-    elsif lat_lng_range_avg > (griddiness*0.05)
-      grid_size = nil
-=end
-    end
+    grid_size = ( lat_lng_range_avg / GRID_SIZE_WINDOW_FRACTION.to_f ).round(3)
+    grid_size = nil if grid_size < MIN_GRID_SIZE_BEFORE_NO_CLUSTERING
 
     grid_size
-
   end
 
 
@@ -74,9 +55,11 @@ class Mappable < ActiveRecord::Base
   #
   # +options+ include:
   #
-  # [+:grid_size+] a Float representing the size of the clusters (lat/lng degrees decimal)
-  # [+:bbox+] a String representing a bbox "#{w}, #{s}, #{e}, #{n}". Will be used
-  # to calculate a +grid_size+ if no +grid_size+ option is provided.
+  # [+:grid_size+] a Float representing the size of the
+  #                clusters (lat/lng degrees decimal)
+  # [+:bbox+]      a String representing a bbox "#{w}, #{s}, #{e}, #{n}".
+  #                Will be used to calculate a +grid_size+ if no +grid_size+
+  #                option is provided.
   #
   # If grid_size is determined to be nil, clusters will simply be the result of a group by geometry.
   # i.e. Clusters of exact geometries (e.g. the same point)
@@ -89,21 +72,17 @@ class Mappable < ActiveRecord::Base
   #
   # The following is an example of the SQL that this will produce:
   #
-  # select
-  #   count(geometry) as cluster_geometry_count,
-  #   ST_AsText(ST_Centroid(ST_Collect( geometry ))) AS cluster_centroid
-  # from "mappables"
-  # group by
-  #   ST_SnapToGrid(geometry, :grid_size)
-  # ;
+  #   select
+  #     count(geometry) as cluster_geometry_count,
+  #     ST_AsText(ST_Centroid(ST_Collect( geometry ))) AS cluster_centroid
+  #   from "mappables"
+  #   group by
+  #     ST_SnapToGrid(geometry, :grid_size)
+  #   ;
 
   def self.cluster options
-    grid_size = options[:grid_size]
     bbox      = options[:bbox]
-
-    if grid_size.nil?
-      grid_size = get_cluster_grid_size(bbox)
-    end
+    grid_size = options[:grid_size] || get_cluster_grid_size(bbox)
 
     if grid_size.nil?
       select{count(geometry).as("cluster_geometry_count")}.

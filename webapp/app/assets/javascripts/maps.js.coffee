@@ -48,7 +48,7 @@ setup_map = () ->
       layer_name = layer["name"]
       layer_id = layer["id"]
       layer_url = map_layers_url + "/" + layer_id
-      wkt_layer_url = layer_url + ".text"
+      geo_json_layer_url = layer_url + ".json"
 
       strategies = []
 
@@ -61,25 +61,28 @@ setup_map = () ->
       else
         strategies = [new OpenLayers.Strategy.Fixed()]
 
-      http_params = {}
+      http_params = {
+        as_geo_json: true
+      }
+
       # Cluster if the cluster checkbox is checked
       if $("#cluster:checked").length > 0
         http_params["cluster"] = true
 
-      wkt_layer = new OpenLayers.Layer.Vector(layer_name, {
+      geo_json_layer_url = new OpenLayers.Layer.Vector(layer_name, {
           strategies: strategies
           projection: geographic
           protocol: new OpenLayers.Protocol.HTTP({
-              url: wkt_layer_url
-              format: new OpenLayers.Format.WKT()
+              url: geo_json_layer_url
+              format: new OpenLayers.Format.GeoJSON()
               params: http_params
           })
       })
 
-      map.addLayer(wkt_layer)
-      map.zoomToMaxExtent()
+      map.addLayer(geo_json_layer_url)
   )
 
+  map.zoomToMaxExtent()
 
 $ ->
   # Setup listeners

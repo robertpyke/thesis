@@ -37,7 +37,7 @@ class LayersController < ApplicationController
       format.text { render :text => @layer.get_wkt(params) }
       format.json {
         if params[:as_geo_json]
-          render :text => @layer.get_geo_json(params)
+          render :json => @layer.get_geo_json(params)
         else
           render :json => @layer
         end

@@ -1,4 +1,4 @@
-[![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/robertpyke/thesis)
+[![Code Climate](https://codeclimate.com/github/robertpyke/thesis.png)](https://codeclimate.com/github/robertpyke/thesis)
 
 Thesis
 ======

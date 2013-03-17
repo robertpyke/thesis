@@ -4,6 +4,8 @@ require File.expand_path('../../config/environment', __FILE__)
 require 'rails/test_help'
 require "paperclip/matchers"
 
+include ActionDispatch::TestProcess
+
 class ActiveSupport::TestCase
   extend Paperclip::Shoulda::Matchers
 

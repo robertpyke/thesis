@@ -5,18 +5,17 @@
 map = null
 
 # Lat/Lng
-geographic = new OpenLayers.Projection("EPSG:4326");
+geographic = new OpenLayers.Projection("EPSG:4326")
 
 # Spherical Meters
-mercator = new OpenLayers.Projection("EPSG:900913");
+mercator = new OpenLayers.Projection("EPSG:900913")
 
 
-world_bounds = new OpenLayers.Bounds();
-world_bounds.extend(new OpenLayers.LonLat(-180,90));
-world_bounds.extend(new OpenLayers.LonLat(180,-90));
-# world_bounds = world_bounds.transform(geographic, mercator);
+# The bounds of the world.
+# Used to set maxExtent on maps/layers
+world_bounds = new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)
 
-zoom_bounds = world_bounds;
+zoom_bounds = world_bounds
 
 setup_map = () ->
   # Clear away the old map
@@ -25,9 +24,14 @@ setup_map = () ->
 
   map = new OpenLayers.Map('map', {
     maxExtent: world_bounds
+    restrictedExtent: world_bounds
+    projection: mercator
+    displayProjection: geographic
+    units: "m"
+    maxResolution: 156543.0339
   })
 
-  layerSwitcher = new OpenLayers.Control.LayerSwitcher();
+  layerSwitcher = new OpenLayers.Control.LayerSwitcher()
   map.addControl(layerSwitcher)
 
   osm_layer = new OpenLayers.Layer.OSM()
@@ -52,6 +56,7 @@ setup_map = () ->
       if $("#bbox:checked").length > 0
         strategies = [new OpenLayers.Strategy.BBOX({
           resFactor: 1.1
+          ratio: 2.0
         })]
       else
         strategies = [new OpenLayers.Strategy.Fixed()]
@@ -66,6 +71,7 @@ setup_map = () ->
 
       geo_json_layer_url = new OpenLayers.Layer.Vector(layer_name, {
           strategies: strategies
+          projection: geographic
           protocol: new OpenLayers.Protocol.HTTP({
               url: geo_json_layer_url
               format: new OpenLayers.Format.GeoJSON()

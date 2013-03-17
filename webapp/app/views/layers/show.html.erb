@@ -5,10 +5,19 @@
   <%= @layer.name %>
 </p>
 
+<% if @layer.csv_file.present? %>
 <p>
-  <b>Data File:</b>
-  <%= link_to "Download data file", @layer.data_file.url %>
+  <b>CSV File:</b>
+  <%= link_to "Download csv file", @layer.csv_file.url %>
 </p>
+<% end %>
+
+<% if @layer.renderable_file.present? %>
+<p>
+  <b>Renderable File:</b>
+  <%= link_to "Download renderable file", @layer.renderable_file.url %>
+</p>
+<% end %>
 
 <%= link_to 'Edit', edit_map_layer_path(@layer.map, @layer) %> |
 <%= link_to 'Back', map_layers_path(@layer.map) %>

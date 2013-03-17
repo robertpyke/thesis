@@ -1,10 +1,23 @@
-class LayerDataFileValidator < ActiveModel::Validator
+class LayerAttachedFileValidator < ActiveModel::Validator
+
+  def validate(layer)
+    if layer.csv_file.present? and layer.renderable_file.present?
+      layer.errors[:base] << "This layer has multiple attached files. It should " +
+                             "only have renderable_file or a csv_file."
+    elsif not layer.csv_file.present? and not layer.renderable_file.present?
+      layer.errors[:base] << "This layer doesn't have any attached files."
+    end
+  end
+
+end
+
+class LayerCSVFileValidator < ActiveModel::Validator
   require 'csv'
 
   def validate(layer)
-    if layer.data_file.file?
-      csv_file = File.new(layer.data_file.queued_for_write[:original].path)
-      csv_rows = CSV.read(csv_file)
+    if layer.csv_file.present?
+      csv_file_f = File.new(layer.csv_file.queued_for_write[:original].path)
+      csv_rows = CSV.read(csv_file_f)
 
       header_row = csv_rows[0]
       content_rows = csv_rows[1..-1]
@@ -15,7 +28,7 @@ class LayerDataFileValidator < ActiveModel::Validator
       if geometry_types.include?(:latitude) and geometry_types.include?(:longitude)
         # all good
       else
-        layer.errors[:data_file] << "doesn't contain " +
+        layer.errors[:csv_file] << "doesn't contain " +
           "latitude and longitude columns"
       end
     end
@@ -31,18 +44,24 @@ class Layer < ActiveRecord::Base
   belongs_to :map
   has_many :mappables, dependent: :destroy
 
-  attr_accessible :name, :data_file
+  attr_accessible :name, :csv_file, :renderable_file
 
-  has_attached_file :data_file
+  has_attached_file :csv_file
+  has_attached_file :renderable_file
 
-  validates_attachment :data_file, presence: true,
-    content_type: { content_type: [ "text", "text/csv", "text/plain"] }
+#  validates_attachment :csv_file,
+#    content_type: { content_type: [ "text", "text/csv", "text/plain", "text/comma-separated-values", "application/csv", "application/excel", "text/anytext"] }
+
+#  validates_attachment :renderable_file, 
+#    content_type: { content_type: [ "text", "text/asc", "text/plain"] }
+  before_validation :clear_old_attachments
 
   # Validate the CSV file as having a single valid geometry column
-  validates_with LayerDataFileValidator
+  validates_with LayerAttachedFileValidator
+  validates_with LayerCSVFileValidator
 
-  # Push the CSV contents into our DB
-  before_save :process_data_file
+  # Check that we have a single attached file, and process the attached file
+  before_save :process_attached_file
 
   # Searches the +csv_row_as_array_of_columns+ for geometry keywords.
   # Geometry keywords include:
@@ -92,45 +111,16 @@ class Layer < ActiveRecord::Base
   # Clears out any existing +mappables+
   # Generates new +mappables+ based on contents of data file
 
-  def process_data_file
-
-    # Clear out the existing mappable entries
+  def process_attached_file
     mappables.clear
-
-    # Add the new mappable entries
-    csv_file = File.new(data_file.queued_for_write[:original].path)
-    csv_rows = CSV.read(csv_file)
-
-    header_row = csv_rows[0]
-    content_rows = csv_rows[1..-1]
-
-    # Create a Hash of the geometry indeces
-    # i -> :geometry_type
-    geometry_index_to_type = Layer.get_geometry_index_to_type_hash(header_row)
-
-    # iterate over the content rows
-    content_rows.each do |content_row|
-      geometry_data = {}
-      descriptors = {}
-
-      content_row.each_with_index do |el, i|
-        is_geom = false
-
-        # Process the column in a special manner if it is a geometry column
-        if geometry_type = geometry_index_to_type[i]
-          geometry_data[geometry_type] = el
-        else
-          descriptor_label = header_row[i]
-          descriptor_value = el
-          descriptors[descriptor_label] = descriptor_value
-        end
-      end
-
-      mappable = build_mappable(geometry_data, descriptors)
+    if csv_file.present?
+      # Clear out the existing mappable entries
+      process_csv_file
+    elsif renderable_file.present?
+      process_renderable_file
     end
-
-    true
   end
+
 
   # Returns an array of GeoJSON::Feature for this layer.
   # Uses +options+ to define how to build a custom array of features.
@@ -198,6 +188,69 @@ class Layer < ActiveRecord::Base
     geoms = features.map { |feature| feature.geometry() }
     feature_collection = Mappable.rgeo_factory_for_column(:geometry).collection(geoms)
     feature_collection.as_text
+  end
+
+  private
+
+  # Removes the attachment that isn't changing
+  #
+  # i.e. if the user uploads a CSV for the layer, the renderable file is removed.
+  # if the user uploads a renderable file for the layer, the CSV is removed.
+
+  def clear_old_attachments
+    if csv_file_updated_at_changed? and not renderable_file_updated_at_changed?
+      renderable_file.clear
+    elsif renderable_file_updated_at_changed? and not csv_file_updated_at_changed?
+      csv_file.clear
+    end
+
+    true
+  end
+
+
+  # Process the attached data file as an ascii grid file
+
+  def process_renderable_file
+    true
+  end
+
+  # Process the attached data file as a CSV file
+
+  def process_csv_file
+
+    # Add the new mappable entries
+    csv_file_f = File.new(csv_file.queued_for_write[:original].path)
+    csv_rows = CSV.read(csv_file_f)
+
+    header_row = csv_rows[0]
+    content_rows = csv_rows[1..-1]
+
+    # Create a Hash of the geometry indeces
+    # i -> :geometry_type
+    geometry_index_to_type = Layer.get_geometry_index_to_type_hash(header_row)
+
+    # iterate over the content rows
+    content_rows.each do |content_row|
+      geometry_data = {}
+      descriptors = {}
+
+      content_row.each_with_index do |el, i|
+        is_geom = false
+
+        # Process the column in a special manner if it is a geometry column
+        if geometry_type = geometry_index_to_type[i]
+          geometry_data[geometry_type] = el
+        else
+          descriptor_label = header_row[i]
+          descriptor_value = el
+          descriptors[descriptor_label] = descriptor_value
+        end
+      end
+
+      mappable = build_mappable(geometry_data, descriptors)
+    end
+
+    true
   end
 
 end

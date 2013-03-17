@@ -6,7 +6,9 @@ defaults: &defaults
   pool: 5
   host: localhost
   port: 5432
-  script_dir: /usr/share/postgresql/9.1/contrib/postgis-1.5/
+
+  # PostGIS 2:
+  postgis_extension: postgis
 
 development:
   <<: *defaults

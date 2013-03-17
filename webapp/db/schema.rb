@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130121113951) do
+ActiveRecord::Schema.define(:version => 20130317020421) do
 
   create_table "descriptors", :force => true do |t|
     t.string   "label"
@@ -24,13 +24,18 @@ ActiveRecord::Schema.define(:version => 20130121113951) do
   create_table "layers", :force => true do |t|
     t.integer  "map_id"
     t.string   "name"
-    t.datetime "created_at",             :null => false
-    t.datetime "updated_at",             :null => false
-    t.string   "data_file_file_name"
-    t.string   "data_file_content_type"
-    t.integer  "data_file_file_size"
-    t.datetime "data_file_updated_at"
-    t.string   "data_file_fingerprint"
+    t.datetime "created_at",                   :null => false
+    t.datetime "updated_at",                   :null => false
+    t.string   "csv_file_file_name"
+    t.string   "csv_file_content_type"
+    t.integer  "csv_file_file_size"
+    t.datetime "csv_file_updated_at"
+    t.string   "csv_file_fingerprint"
+    t.string   "renderable_file_file_name"
+    t.string   "renderable_file_content_type"
+    t.integer  "renderable_file_file_size"
+    t.datetime "renderable_file_updated_at"
+    t.string   "renderable_file_fingerprint"
   end
 
   add_index "layers", ["map_id"], :name => "index_layers_on_map_id"

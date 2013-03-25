@@ -5,6 +5,17 @@ echo "BEGIN"
 echo ""
 
 echo "*************************"
+echo "- CONFIGURING LOCALES"
+echo "*************************"
+
+export LANGUAGE="en_US.UTF-8"
+export LANG="en_US.UTF-8"
+export LC_ALL="en_US.UTF-8"
+
+locale-gen en_US.UTF-8
+dpkg-reconfigure locales
+
+echo "*************************"
 echo "- UPDATING"
 echo "*************************"
 
@@ -18,7 +29,7 @@ echo "*************************"
 apt-get install -y build-essential
 
 echo "*************************"
-echo "- INSTALLING GEO"
+echo "- INSTALLING DB & GEO EXTENSIONS"
 echo "*************************"
 
 apt-get install -y python-software-properties
@@ -28,13 +39,16 @@ apt-get update
 
 apt-get install -y postgis
 
-exit 0
+sudo -u postgres psql -c "create role robert_thesis_pg_user SUPERUSER login password 'login_password';"
+
+apt-get install -y libpq-dev
+
 
 echo "*************************"
 echo "- INSTALLING DEV TOOLS"
 echo "*************************"
 
-apt-get install -y vim-core
+apt-get install -y vim
 apt-get install -y git-core
 
 echo "*************************"
@@ -42,20 +56,24 @@ echo "- INSTALLING RUBIES"
 echo "*************************"
 
 apt-get install -y ruby1.9.3
+apt-get install -y libmapscript-ruby1.9.1
 gem1.9.3 install bundler
 
 echo "*************************"
 echo "- SETTING UP RAILS APP"
 echo "*************************"
 
-git clone git://github.com/robertpyke/thesis.git
-cd thesis/webapp && bundle install
+cd /vagrant/webapp
+bundle install
+
+rake db:create:all
+rake db:migrate
 
 echo "*************************"
 echo "- STARTING RAILS APP"
 echo "*************************"
 
-nohup rails s &
+rails s -d
 
 echo ""
 echo "DONE"

@@ -109,6 +109,9 @@ Vagrant.configure("2") do |config|
   #
   #   chef.validation_client_name = "ORGNAME-validator"
 
+  # x11 forwarding
+  config.ssh.forward_x11
+
   # provision
   config.vm.provision :shell, :path => "bootstrap.sh"
 end

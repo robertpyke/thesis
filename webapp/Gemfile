@@ -57,3 +57,7 @@ gem 'nested_scaffold'
 # Gems for attaching files to models
 gem "paperclip", "~> 3.0"
 
+# Javascript Runtimes
+gem 'execjs'
+
+gem 'therubyracer'

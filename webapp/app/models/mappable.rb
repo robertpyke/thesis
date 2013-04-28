@@ -55,7 +55,8 @@ class Mappable < ActiveRecord::Base
   #
   # +options+ include:
   #
-  # [+:grid_size]  the size of the grid_size to use
+  # [+:grid_size]  a Float representing the size of the
+  #                clusters (lat/lng degrees decimal)
   # [+:bbox+]      a String representing a bbox "#{w}, #{s}, #{e}, #{n}".
   #                Will be used to calculate a +grid_size+ if no +grid_size+
   #                option is provided.

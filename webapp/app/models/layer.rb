@@ -38,6 +38,8 @@ end
 
 class Layer < ActiveRecord::Base
 
+  include GeospatialVisualisationTechniqueProxy
+
   # The maximum number of features to return from a query
   FEATURES_QUERY_LIMIT = 1000
 
@@ -54,6 +56,7 @@ class Layer < ActiveRecord::Base
 
 #  validates_attachment :renderable_file, 
 #    content_type: { content_type: [ "text", "text/asc", "text/plain"] }
+
   before_validation :clear_old_attachments
 
   # Validate the CSV file as having a single valid geometry column
@@ -121,57 +124,6 @@ class Layer < ActiveRecord::Base
     end
   end
 
-
-  # Returns an array of GeoJSON::Feature for this layer.
-  # Uses +options+ to define how to build a custom array of features.
-  # +options+ include:
-  #
-  # [+:bbox+] a String representing a bbox "#{w}, #{s}, #{e}, #{n}"
-  # [+:cluster+] +!nil+ if you want the features to be clustered
-  # [+:grid_size+] a Float representing the size of the clusters (lat/lng degrees decimal)
-  #
-  # The size of the array returned is limited by +FEATURES_QUERY_LIMIT+
-  # regardless of options
-  #
-  # Note: The GeoJSON::Feature object type is used as a convenience wrapper to
-  # allow the geometry to be provided with additional information (properties and feature_id).
-  # The underlying geometry can be attained via the GeoJSON::Feature instance
-  # function geometry().
-  #
-  # *Important*: The GeoJSON::Feature is a wrapper. It isn't the same as RGeo::Feature::Geometry.
-  # You should _peel back_ the wrapper if you intend to use the feature for anything
-  # other than GeoJSON encoding. You can _peel back_ the wrapper via the GeoJSON::Feature
-  # instance function +geometry()+.
-
-  def get_features(options)
-    features = []
-    mappable_relation = nil
-    if options[:bbox]
-      mappable_relation = mappables.in_rect(options[:bbox].split(','))
-    else
-      mappable_relation = mappables
-    end
-
-    if options[:cluster]
-      cluster_result = nil
-      cluster_result = mappable_relation.cluster(options)
-      cluster_result.limit(FEATURES_QUERY_LIMIT).each do |cluster|
-        geom_feature = Mappable.rgeo_factory_for_column(:geometry).parse_wkt(cluster.cluster_centroid)
-        feature = RGeo::GeoJSON::Feature.new(geom_feature, nil, { cluster_size: cluster.cluster_geometry_count.to_i })
-
-        features << feature
-      end
-    else
-      mappable_relation.limit(FEATURES_QUERY_LIMIT).each do |mappable|
-        geom_feature = mappable.geometry
-        feature = RGeo::GeoJSON::Feature.new(geom_feature, mappable.id, { cluster_size: 1 })
-        features << feature
-      end
-    end
-
-    features
-  end
-
   # Returns the layer's +mappables+ as a GeometryCollection
   # in *GeoJSON* (+String+)
 
@@ -191,6 +143,7 @@ class Layer < ActiveRecord::Base
   end
 
   private
+
 
   # Removes the attachment that isn't changing
   #
